@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duito loquete</title>
+    <!-- Confeti para el final -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: #120c1f;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .glow-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 380px;
+            height: 380px;
+            background: #ff70a6;
+            filter: blur(140px);
+            opacity: 0.45;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .glow-2 {
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 380px;
+            height: 380px;
+            background: #a374ff;
+            filter: blur(140px);
+            opacity: 0.45;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .glow-3 {
+            position: fixed;
+            top: 40%;
+            right: 20%;
+            width: 250px;
+            height: 250px;
+            background: #70d6ff;
+            filter: blur(130px);
+            opacity: 0.25;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 20, 50, 0.7);
+            border: 1px solid rgba(255, 182, 218, 0.25);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 112, 166, 0.25);
+            border-radius: 24px;
+            padding: 32px 24px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 112, 166, 0.15);
+            border: 1px solid rgba(255, 182, 218, 0.35);
+            color: #ffb6da;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        p.subtitle {
+            color: #d1c4e9;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        /* Pregunta */
+        .question-container {
+            background: rgba(18, 12, 31, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px 16px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f5efff;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+
+        /* Opciones */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opt-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 182, 218, 0.15);
+            color: #f1e4ff;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-button:hover {
+            background: linear-gradient(135deg, rgba(255, 112, 166, 0.35) 0%, rgba(163, 116, 255, 0.35) 100%);
+            border-color: rgba(255, 182, 218, 0.6);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 112, 166, 0.25);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Contenedor de Botones bien separados */
+        .btn-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 28px;
+            position: relative;
+            min-height: 60px;
+            width: 100%;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff70a6 0%, #a374ff 100%);
+            border: none;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            padding: 14px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 112, 166, 0.4);
+            transition: all 0.2s;
+            z-index: 2;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(163, 116, 255, 0.5);
+        }
+
+        .no-holder {
+            position: relative;
+            width: 100px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-no {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ff8fa3;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 14px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: all 0.15s ease;
+            z-index: 10;
+        }
+
+        .result-box {
+            background: rgba(18, 12, 31, 0.65);
+            border: 1px solid rgba(255, 182, 218, 0.25);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+            text-align: left;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #e2d7f5;
+        }
+
+        .emoji-header {
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+    <div class="glow-3"></div>
+
+    <div class="card">
+        
+        <div id="screen-quiz">
+            <div class="pill"> Preguntas rapiditas</div>
+            <h1>A ver que sale aca ajskda</h1>
+            <p class="subtitle">Responde esto rapido antes de seguir jugando</p>
+
+            <div class="question-container">
+                <div class="question-text" id="q-title">Cargando...</div>
+            </div>
+
+            <div class="options-list" id="opts-list"></div>
+        </div>
+
+
+        <div id="screen-final" class="hidden">
+            <div class="emoji-header">👾✨</div>
+            <div class="pill"> Confirmado</div>
+            <h1>Dúo goty c:</h1>
+            <p class="subtitle" style="margin-top: 10px; color: #f1e4ff;">
+                Ya van <strong>varios dias seguidos</strong> hablando todos los días y viciando demasiao jaskd<br><br>
+                <strong>¿Crees q seremos duo bastante tiempo?</strong>
+            </p>
+
+            <div class="btn-wrapper">
+                <button class="btn-yes" onclick="finishGame()">Sipi por bastante tiempo </button>
+                <div class="no-holder">
+                    <button class="btn-no" id="no-btn" onmouseover="escapeBtn()" onclick="escapeBtn()">Nou solo por poco tiempo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-result" class="hidden">
+            <div class="emoji-header">🎉✨</div>
+            <div class="pill" style="background: rgba(163, 116, 255, 0.2); border-color: rgba(163, 116, 255, 0.4); color: #c4a1ff;">
+                ajskdjask uena tq weoncita
+            </div>
+            <h1>Ps somos duo ajskdajs</h1>
+
+            <div class="result-box">
+                <p>¡Bueno bueno bueno </p><br>
+                <p>En verdad qué piola llevar meses seguidos hablando todos los días y jugando sin aburrirnos.</p><br>
+                <p>Se pasa el tiempo al toque. a seguir jugando mas loquete jaskd de lo que sea</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                q: "1. ¿De quién es la culpa si nos botan la primera torre al min 10?",
+                options: ["Del Jungla (obvio)", "Del ping feo", "De nosotros por trollear", "De Riot Games"]
+            },
+            {
+                q: "2. ¿Nuestra mejor jugada hasta la fecha?",
+                options: ["Meter 'FF al 15' y ganar", "Salvar al otro y morir los dos", "Tiltearnos", "Combo 2v5 keria gumayusi"]
+            },
+            {
+                q: "3. Llevamos meses hablando todos los días ¿Q sera?",
+                options: ["Mucho vicio", "Exceso de lol", "Dúos de por vida¿?", "Todas las anteriores"]
+            }
+        ];
+
+        let index = 0;
+
+        function loadQuestion() {
+            if (index < quizData.length) {
+                document.getElementById('q-title').innerText = quizData[index].q;
+                const container = document.getElementById('opts-list');
+                container.innerHTML = '';
+
+                quizData[index].options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'opt-button';
+                    btn.innerHTML = `<span>${opt}</span> <span style="opacity:0.6;">➔</span>`;
+                    btn.onclick = () => {
+                        index++;
+                        loadQuestion();
+                    };
+                    container.appendChild(btn);
+                });
+            } else {
+                document.getElementById('screen-quiz').classList.add('hidden');
+                document.getElementById('screen-final').classList.remove('hidden');
+            }
+        }
+
+        function escapeBtn() {
+            const btn = document.getElementById('no-btn');
+            const x = (Math.random() - 0.5) * 220;
+            const y = (Math.random() - 0.5) * 140;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function finishGame() {
+            document.getElementById('screen-final').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            confetti({
+                particleCount: 110,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#ff70a6', '#a374ff', '#70d6ff', '#ffb6da']
+            });
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
